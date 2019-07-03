@@ -73,7 +73,7 @@ public class LimitUtils {
                 .add("X-LC-Id", id)
                 .add("X-LC-Key", key)
                 .build();
-        NetUtil.getInstance().get(new ConvertCallback.Callback<String>() {
+        NetUtil.getInstance().getSync(new ConvertCallback.Callback<String>() {
                                       @Override
                                       public void onSuccess(String response) {
                                           int state = 0;

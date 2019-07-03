@@ -52,7 +52,7 @@ public class NetUtil {
      *
      * @param url_headers_tag String Headers Object
      */
-    public Observable<Response> get(Object... url_headers_tag) {
+    public Observable<Response> getRx(Object... url_headers_tag) {
         Headers headers;
         if (getParams(url_headers_tag, 1) == null) {
             headers = new Headers.Builder().build();
@@ -97,7 +97,7 @@ public class NetUtil {
      *
      * @param url_headers_formBody String Headers FormBody
      */
-    public Observable<Response> post(Object... url_headers_formBody) {
+    public Observable<Response> postRx(Object... url_headers_formBody) {
         Headers headers;
         if (getParams(url_headers_formBody, 1) == null) {
             headers = new Headers.Builder().build();
