@@ -1,8 +1,13 @@
-> maven { url "https://jitpack.io" }
-> implementation 'com.github.XSation.AgileUtils:limitapp:master-SNAPSHOT'
-> implementation 'com.github.XSation.AgileUtils:netutils:master-SNAPSHOT'
-> implementation 'com.github.XSation.AgileUtils:dbutils:master-SNAPSHOT'
-> implementation 'com.github.XSation.AgileUtils:common:master-SNAPSHOT'
+
+```
+maven { url "https://jitpack.io" }
+
+implementation 'com.github.XSation.AgileUtils:limitapp:master-SNAPSHOT'
+implementation 'com.github.XSation.AgileUtils:netutils:master-SNAPSHOT'
+implementation 'com.github.XSation.AgileUtils:dbutils:master-SNAPSHOT'
+implementation 'com.github.XSation.AgileUtils:common:master-SNAPSHOT'
+```
+
 
 - common
     - AppUtils application中初始化
