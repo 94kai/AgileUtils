@@ -2,22 +2,21 @@ package com.xk.limitapp;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
+
+import com.xk.common.utils.SpUtils;
+import com.xk.netutils.ConvertCallback;
+import com.xk.netutils.NetUtil;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import okhttp3.Headers;
 
 /**
  * 1.0.0-SNAPSHOT
+ *
  * @author xuekai1
  * @date 2019-05-28
  */
@@ -32,25 +31,13 @@ public class LimitUtils {
             @Override
             public void run() {
                 boolean isLimit;
-                isLimit = getFromSp(context);
-                if (!isLimit) {
+                if (!SpUtils.getBoolean("isLimit", true)) {
                     //sp中返回了不限制，可以直接return了。
                     return;
                 }
-                isLimit = getStateFromNet(packageName, context);
-                if (!isLimit) {
-                    //通过网络返回了不限制，可以直接return了。
-                    return;
-                }
-                context.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        showWaring(context);
-                    }
-                });
+                getStateFromNet(packageName, context);
             }
         }).start();
-
     }
 
     private static void showWaring(final Activity context) {
@@ -80,82 +67,50 @@ public class LimitUtils {
      *
      * @return isLimit
      */
-    private static boolean getStateFromNet(String packageName, Activity context) {
-        int state;
+    private static void getStateFromNet(String packageName, final Activity context) {
 
-        HttpURLConnection conn = null;
-        try {
-            // 利用string url构建URL对象
-            URL mURL = new URL(host + "LimitingApp?where={\"PackageName\":\"" + packageName + "\"}");
-
-            conn = (HttpURLConnection) mURL.openConnection();
-
-            conn.setRequestMethod("GET");
-            conn.setReadTimeout(5000);
-            conn.setConnectTimeout(10000);
-            conn.setRequestProperty("X-LC-Id", id);
-            conn.setRequestProperty("X-LC-Key", key);
-
-            int responseCode = conn.getResponseCode();
-            if (responseCode == 200) {
-
-                InputStream is = conn.getInputStream();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-                StringBuffer sb = new StringBuffer();
-                String line = null;
-                while ((line = reader.readLine()) != null) {
-                    sb.append(line + "\n");
+        Headers headers = new Headers.Builder()
+                .add("X-LC-Id", id)
+                .add("X-LC-Key", key)
+                .build();
+        NetUtil.getInstance().get(new ConvertCallback.Callback<String>() {
+            @Override
+            public void onSuccess(String response) {
+                int state = 0;
+                JSONObject jsonObject;
+                try {
+                    jsonObject = new JSONObject(response);
+                    JSONArray results = jsonObject.getJSONArray("results");
+                    if (results.length() > 0) {
+                        JSONObject o = (JSONObject) results.get(0);
+                        Object limiteType = o.get("limitType");
+                        state = (int) limiteType;
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    showWaring(context);
+                    return;
                 }
-                String reponse = sb.toString();
-
-                JSONObject jsonObject = new JSONObject(reponse);
-                JSONArray results = jsonObject.getJSONArray("results");
-                if (results.length() > 0) {
-                    JSONObject o = (JSONObject) results.get(0);
-                    Object limiteType = o.get("limitType");
-                    state = (int) limiteType;
+                boolean isLimit;
+                if (state == 1) {
+                    isLimit = false;
+                } else if (state == 2) {
+                    SpUtils.putBoolean("isLimit", false);
+                    isLimit = false;
                 } else {
-                    state = 0;
+                    isLimit = true;
                 }
-            } else {
-                state = 0;
+                if (!isLimit) {
+                    //通过网络返回了不限制，可以直接return了。
+                    return;
+                }
+                showWaring(context);
             }
 
-        } catch (Exception e) {
-            state = 0;
-            e.printStackTrace();
-        } finally {
-            if (conn != null) {
-                conn.disconnect();
+            @Override
+            public void onError(Exception e) {
+                showWaring(context);
             }
-        }
-
-        if (state == 0) {
-            return true;
-        } else if (state == 1) {
-            return false;
-        } else if (state == 2) {
-            SharedPreferences config = context.getSharedPreferences("config", Context.MODE_PRIVATE);
-            config.edit().putBoolean("isLimit", false).apply();
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    private static boolean getFromSp(Activity context) {
-        SharedPreferences config = context.getSharedPreferences("config", Context.MODE_PRIVATE);
-        return config.getBoolean("isLimit", true);
-    }
-
-    //根据字节数组构建UTF-8字符串
-    private String getStringByBytes(byte[] bytes) {
-        String str = "";
-        try {
-            str = new String(bytes, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return str;
+        }, host + "LimitingApp?where={\"PackageName\":\"" + packageName + "\"}", headers);
     }
 }
