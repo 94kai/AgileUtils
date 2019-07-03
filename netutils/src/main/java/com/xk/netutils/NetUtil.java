@@ -3,10 +3,10 @@ package com.xk.netutils;
 import com.xk.netutils.rx.RxScheduleHelper;
 
 import io.reactivex.Observable;
-import okhttp3.FormBody;
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
@@ -54,15 +54,15 @@ public class NetUtil {
      */
     public Observable<Response> get(Object... url_headers_tag) {
         Headers headers;
-        if (url_headers_tag == null || url_headers_tag[1] == null) {
+        if (getParams(url_headers_tag, 1) == null) {
             headers = new Headers.Builder().build();
         } else {
-            headers = (Headers) url_headers_tag[1];
+            headers = (Headers) getParams(url_headers_tag, 1);
         }
         Request request = new Request.Builder()
                 .headers(headers)
-                .url(url_headers_tag == null ? "" : ((String) url_headers_tag[0]))
-                .tag(url_headers_tag == null ? null : url_headers_tag[2])
+                .url((String) getParams(url_headers_tag, 0))
+                .tag(getParams(url_headers_tag, 2))
                 .build();
         return Observable.<Response>create(emitter -> {
             //异步请求
@@ -79,21 +79,35 @@ public class NetUtil {
      */
     private Observable<Response> post(Object... url_headers_formBody) {
         Headers headers;
-        if (url_headers_formBody == null || url_headers_formBody[1] == null) {
+        if (getParams(url_headers_formBody, 1) == null) {
             headers = new Headers.Builder().build();
         } else {
-            headers = (Headers) url_headers_formBody[1];
+            headers = (Headers) getParams(url_headers_formBody, 1);
         }
         Request request = new Request.Builder()
                 .headers(headers)
-                .method("post", url_headers_formBody == null ? null : ((FormBody) url_headers_formBody[2]))
-                .url(url_headers_formBody == null ? "" : ((String) url_headers_formBody[0]))
+                .method("post", (RequestBody) getParams(url_headers_formBody, 2))
+                .url((String) getParams(url_headers_formBody, 0))
                 .build();
         return Observable.<Response>create(emitter -> {
             //异步请求
             Response response = getOkHttpClient().newCall(request).execute();
             emitter.onNext(response);
         }).compose(RxScheduleHelper.io_main());
+    }
+
+    /**
+     * 获取可变参数的值
+     */
+    private Object getParams(Object[] params, int index) {
+        if (params == null) {
+            return null;
+        }
+        if (index < params.length) {
+            return params[index];
+        } else {
+            return null;
+        }
     }
 }
 
