@@ -8,7 +8,7 @@ import android.widget.Toast;
  * @author xuekai1
  * @date 2019-06-21
  */
-public class ToastUtil {
+public class ToastUtils {
     private static Toast toast;
 
     private static Handler mainHandler;

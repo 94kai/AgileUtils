@@ -5,7 +5,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 
-public class KeyboardUtil {
+public class KeyboardUtils {
 
     /**
      * 调起软键盘
