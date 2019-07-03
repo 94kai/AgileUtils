@@ -76,7 +76,7 @@ public class NetUtil {
      *
      * @param url_headers_tag String Headers Object
      */
-    public <T> void get(ConvertCallback.Callback<T> callback, Class<T> clazz, Object... url_headers_tag) {
+    public <T> void getSync(ConvertCallback.Callback<T> callback, Class<T> clazz, Object... url_headers_tag) {
         ConvertCallback<T> convertCallback = new ConvertCallback<>(callback, clazz);
         Headers headers;
         if (getParams(url_headers_tag, 1) == null) {
@@ -121,7 +121,7 @@ public class NetUtil {
      *
      * @param url_headers_formBody String Headers FormBody
      */
-    public <T> void post(ConvertCallback.Callback<T> callback, Class<T> clazz, Object... url_headers_formBody) {
+    public <T> void postSync(ConvertCallback.Callback<T> callback, Class<T> clazz, Object... url_headers_formBody) {
         ConvertCallback<T> convertCallback = new ConvertCallback<>(callback, clazz);
 
         Headers headers;
