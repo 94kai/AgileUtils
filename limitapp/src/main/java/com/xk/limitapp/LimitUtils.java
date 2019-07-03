@@ -74,43 +74,44 @@ public class LimitUtils {
                 .add("X-LC-Key", key)
                 .build();
         NetUtil.getInstance().get(new ConvertCallback.Callback<String>() {
-            @Override
-            public void onSuccess(String response) {
-                int state = 0;
-                JSONObject jsonObject;
-                try {
-                    jsonObject = new JSONObject(response);
-                    JSONArray results = jsonObject.getJSONArray("results");
-                    if (results.length() > 0) {
-                        JSONObject o = (JSONObject) results.get(0);
-                        Object limiteType = o.get("limitType");
-                        state = (int) limiteType;
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    showWaring(context);
-                    return;
-                }
-                boolean isLimit;
-                if (state == 1) {
-                    isLimit = false;
-                } else if (state == 2) {
-                    SpUtils.putBoolean("isLimit", false);
-                    isLimit = false;
-                } else {
-                    isLimit = true;
-                }
-                if (!isLimit) {
-                    //通过网络返回了不限制，可以直接return了。
-                    return;
-                }
-                showWaring(context);
-            }
+                                      @Override
+                                      public void onSuccess(String response) {
+                                          int state = 0;
+                                          JSONObject jsonObject;
+                                          try {
+                                              jsonObject = new JSONObject(response);
+                                              JSONArray results = jsonObject.getJSONArray("results");
+                                              if (results.length() > 0) {
+                                                  JSONObject o = (JSONObject) results.get(0);
+                                                  Object limiteType = o.get("limitType");
+                                                  state = (int) limiteType;
+                                              }
+                                          } catch (JSONException e) {
+                                              e.printStackTrace();
+                                              showWaring(context);
+                                              return;
+                                          }
+                                          boolean isLimit;
+                                          if (state == 1) {
+                                              isLimit = false;
+                                          } else if (state == 2) {
+                                              SpUtils.putBoolean("isLimit", false);
+                                              isLimit = false;
+                                          } else {
+                                              isLimit = true;
+                                          }
+                                          if (!isLimit) {
+                                              //通过网络返回了不限制，可以直接return了。
+                                              return;
+                                          }
+                                          showWaring(context);
+                                      }
 
-            @Override
-            public void onError(Exception e) {
-                showWaring(context);
-            }
-        }, host + "LimitingApp?where={\"PackageName\":\"" + packageName + "\"}", headers);
+                                      @Override
+                                      public void onError(Exception e) {
+                                          showWaring(context);
+                                      }
+                                  }, String.class,
+                host + "LimitingApp?where={\"PackageName\":\"" + packageName + "\"}", headers);
     }
 }
