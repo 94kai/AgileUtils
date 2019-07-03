@@ -3,7 +3,6 @@ package com.xk.netutils;
 import com.xk.netutils.rx.RxScheduleHelper;
 
 import io.reactivex.Observable;
-import okhttp3.Callback;
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -77,7 +76,8 @@ public class NetUtil {
      *
      * @param url_headers_tag String Headers Object
      */
-    public void get(Callback callback, Object... url_headers_tag) {
+    public <T> void get(ConvertCallback.Callback<T> callback, Class<T> clazz, Object... url_headers_tag) {
+        ConvertCallback<T> convertCallback = new ConvertCallback<>(callback, clazz);
         Headers headers;
         if (getParams(url_headers_tag, 1) == null) {
             headers = new Headers.Builder().build();
@@ -89,7 +89,7 @@ public class NetUtil {
                 .url((String) getParams(url_headers_tag, 0))
                 .tag(getParams(url_headers_tag, 2))
                 .build();
-        new Thread(() -> getOkHttpClient().newCall(request).enqueue(callback)).start();
+        new Thread(() -> getOkHttpClient().newCall(request).enqueue(convertCallback)).start();
     }
 
     /**
@@ -121,7 +121,9 @@ public class NetUtil {
      *
      * @param url_headers_formBody String Headers FormBody
      */
-    public void post(Callback callback, Object... url_headers_formBody) {
+    public <T> void post(ConvertCallback.Callback<T> callback, Class<T> clazz, Object... url_headers_formBody) {
+        ConvertCallback<T> convertCallback = new ConvertCallback<>(callback, clazz);
+
         Headers headers;
         if (getParams(url_headers_formBody, 1) == null) {
             headers = new Headers.Builder().build();
@@ -133,7 +135,7 @@ public class NetUtil {
                 .method("post", (RequestBody) getParams(url_headers_formBody, 2))
                 .url((String) getParams(url_headers_formBody, 0))
                 .build();
-        new Thread(() -> getOkHttpClient().newCall(request).enqueue(callback)).start();
+        new Thread(() -> getOkHttpClient().newCall(request).enqueue(convertCallback)).start();
     }
 
     /**
