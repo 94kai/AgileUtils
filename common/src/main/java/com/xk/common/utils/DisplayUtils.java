@@ -1,8 +1,8 @@
 package com.xk.common.utils;
 
-import android.app.Application;
 import android.content.Context;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.WindowManager;
 
 /**
@@ -10,26 +10,29 @@ import android.view.WindowManager;
  * @date 2019-06-21
  */
 public class DisplayUtils {
-    private static Application app;
     private static WindowManager windowManager;
     private static DisplayMetrics displayMetrics;
+    private static Display display;
 
-    public DisplayUtils() {
+    private static DisplayMetrics getDisplayMetrics() {
+        if (displayMetrics == null) {
+            displayMetrics = new DisplayMetrics();
+            windowManager = (WindowManager) AppUtils.getApplication().getSystemService(Context.WINDOW_SERVICE);
+            getDisplay().getMetrics(displayMetrics);
+        }
+        return displayMetrics;
     }
 
-    public static void init(Application application) {
-        app = application;
-        getDisplayMetrics();
+    public static Display getDisplay() {
+        if (display == null) {
+            windowManager = (WindowManager) AppUtils.getApplication().getSystemService(Context.WINDOW_SERVICE);
+            display = windowManager.getDefaultDisplay();
+        }
+        return display;
     }
 
-    private static void getDisplayMetrics() {
-        displayMetrics = new DisplayMetrics();
-        windowManager = (WindowManager) app.getSystemService(Context.WINDOW_SERVICE);
-        windowManager.getDefaultDisplay().getMetrics(displayMetrics);
-    }
-
-    public static float getDensity() {
-        return displayMetrics.density;
+    private static float getDensity() {
+        return getDisplayMetrics().density;
     }
 
     public static int dip2px(float var0) {
@@ -38,10 +41,10 @@ public class DisplayUtils {
     }
 
     public static int getWidth() {
-        return windowManager.getDefaultDisplay().getWidth();
+        return getDisplay().getWidth();
     }
 
     public static int getHeight() {
-        return windowManager.getDefaultDisplay().getHeight();
+        return getDisplay().getHeight();
     }
 }

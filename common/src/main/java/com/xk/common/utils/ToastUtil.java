@@ -1,6 +1,5 @@
 package com.xk.common.utils;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
@@ -14,13 +13,12 @@ public class ToastUtil {
 
     private static Handler mainHandler;
 
-    public static void init(Context context) {
-        toast = Toast.makeText(context, "", Toast.LENGTH_LONG);
-        Looper mainLooper = Looper.getMainLooper();
-        mainHandler = new Handler(mainLooper);
-    }
-
     public static void show(String msg) {
+        if (toast == null) {
+            toast = Toast.makeText(AppUtils.getApplication(), "", Toast.LENGTH_LONG);
+            Looper mainLooper = Looper.getMainLooper();
+            mainHandler = new Handler(mainLooper);
+        }
         Looper mainLooper = Looper.getMainLooper();
         if (Thread.currentThread() == mainLooper.getThread()) {
             toast.setText(msg);
