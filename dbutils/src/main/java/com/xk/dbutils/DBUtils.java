@@ -1,7 +1,7 @@
 package com.xk.dbutils;
 
 /**
- * 1.0.0-SNAPSHOT
+ * 1.0.0-SNAPSHOT1
  * @author xuekai1
  * @date 2019-06-11
  */
