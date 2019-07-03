@@ -1,0 +1,6 @@
+- netutils
+    - api 'com.squareup.okhttp3:okhttp:3.14.2'
+    - api 'com.google.code.gson:gson:2.8.5'
+    - api 'com.facebook.fresco:fresco:1.13.0'
+- limitapp
+    - netutils
